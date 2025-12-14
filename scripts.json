@@ -3,5 +3,10 @@
         "name":"电子书同步器",
         "author":"PPN",
         "url":"https://bandburgscript.02studio.xyz/script/ebookscript.js"
+    },
+    {
+        "name":"interconnect",
+        "author":"PPN",
+        "url":"https://bandburgscript.02studio.xyz/script/interconnect.js"
     }
 ]

@@ -8,5 +8,10 @@
         "name":"interconnect",
         "author":"PPN",
         "url":"https://bandburgscript.02studio.xyz/script/interconnect.js"
+    },
+    {
+        "name":"简明天气同步器",
+        "author":"Zaona",
+        "url":"https://bandburgscript.02studio.xyz/script/simple-weather-bandburg-script.js"
     }
 ]

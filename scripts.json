@@ -18,5 +18,10 @@
         "name":"DIYface图片同步器",
         "author":"PPN",
         "url":"https://bandburgscript.02studio.xyz/script/diyfacescript.js"
+    },
+    {
+        "name":"OMusic同步器",
+        "author":"OrPudding",
+        "url":"https://bandburgscript.02studio.xyz/script/omusichelper.js"
     }
 ]

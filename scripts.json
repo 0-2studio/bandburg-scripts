@@ -23,5 +23,10 @@
         "name":"OMusic同步器",
         "author":"OrPudding",
         "url":"https://bandburgscript.02studio.xyz/script/omusichelper.js"
+    },
+    {
+        "name":"真智学同步器",
+        "author":"RiseForever",
+        "url":"https://bandburgscript.02studio.xyz/script/real-zhixue-script.js"
     }
 ]

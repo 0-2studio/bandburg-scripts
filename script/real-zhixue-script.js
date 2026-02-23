@@ -4,7 +4,7 @@
  */
 
 // ========== 配置区 ==========
-var _PKG = "moe.riseforever.realzx";
+var _PKG = "moe.riseforever.realzhixue";
 var _STORE_KEY = "zhixue_cookie_cache_v1";
 var _DEBUG = true;
 

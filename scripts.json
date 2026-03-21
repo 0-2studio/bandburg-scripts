@@ -28,5 +28,10 @@
         "name":"真智学同步器",
         "author":"RiseForever",
         "url":"https://bandburgscript.02studio.xyz/script/real-zhixue-script.js"
+    },
+    {
+        "name":"我的世界同步器",
+        "author":"PPN",
+        "url":"https://bandburgscript.02studio.xyz/script/minecraft-archive-manager.js"
     }
 ]

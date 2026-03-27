@@ -112,9 +112,9 @@ gotoapp();
 
   const gui = sandbox.gui(guiConfig);
 
-  // 文件选择处理
-  function handleFileSelect(file) {
-    if (!file) {
+  // 文件选择处理（GUI 返回的是 {name, type, size, data} 对象，data 是 Base64）
+  function handleFileSelect(fileData) {
+    if (!fileData || !fileData.data) {
       currentFile = null;
       currentFileData = null;
       updateStatus('未选择文件', 'fileInfo');
@@ -122,15 +122,15 @@ gotoapp();
       return;
     }
 
-    currentFile = file;
-    sandbox.log(`选择文件: ${file.name}`);
-    sandbox.log(`原始文件大小: ${file.size} bytes`);
-    sandbox.log(`文件类型: ${file.type}`);
+    currentFile = fileData;
+    sandbox.log(`选择文件: ${fileData.name}`);
+    sandbox.log(`文件大小: ${fileData.size} bytes`);
+    sandbox.log(`文件类型: ${fileData.type}`);
 
-    updateStatus(`已选择: ${file.name} (${formatFileSize(file.size)})`, 'fileInfo');
+    updateStatus(`已选择: ${fileData.name} (${formatFileSize(fileData.size)})`, 'fileInfo');
 
-    // 检查文件大小（原始文件可以大一些，处理后会压缩）
-    if (file.size > MAX_FILE_SIZE * 5) {
+    // 检查文件大小
+    if (fileData.size > MAX_FILE_SIZE * 5) {
       updateStatus('错误: 文件大小超过 5MB 限制', 'statusText');
       sandbox.log('错误: 文件大小超过 5MB 限制');
       currentFile = null;
@@ -160,17 +160,7 @@ gotoapp();
     sandbox.log(`目标尺寸: 宽${targetWidth} x 高${targetHeight} 像素`);
   }
 
-  // 读取文件为 Data URL
-  function readFileAsDataURL(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = (e) => reject(new Error('读取文件失败'));
-      reader.readAsDataURL(file);
-    });
-  }
-
-  // 加载图片
+  // 加载图片（从 data URL）
   function loadImage(dataUrl) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -184,7 +174,7 @@ gotoapp();
   async function resizeImageToPNG(img, targetW, targetH) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     canvas.width = targetW;
     canvas.height = targetH;
 
@@ -195,9 +185,9 @@ gotoapp();
     // 计算裁剪区域（居中裁剪，保持比例）
     const imgRatio = img.width / img.height;
     const targetRatio = targetW / targetH;
-    
+
     let sx, sy, sw, sh;
-    
+
     if (imgRatio > targetRatio) {
       // 图片更宽，裁剪左右
       sh = img.height;
@@ -214,7 +204,7 @@ gotoapp();
 
     // 绘制图片到 Canvas（居中裁剪并缩放）
     ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetW, targetH);
-    
+
     // 转换为 PNG 格式
     return canvas.toDataURL('image/png');
   }
@@ -272,11 +262,11 @@ gotoapp();
     try {
       // 读取目标尺寸
       readTargetDimensions();
-      
-      // 读取原始文件
-      updateStatus('正在读取文件...', 'statusText');
-      const dataUrl = await readFileAsDataURL(currentFile);
-      
+
+      // 直接使用 GUI 已转换的 Base64 数据创建 data URL
+      // currentFile 是 {name, type, size, data} 对象，data 是 Base64 编码
+      const dataUrl = `data:${currentFile.type || 'image/png'};base64,${currentFile.data}`;
+
       // 加载图片
       updateStatus('正在加载图片...', 'statusText');
       const img = await loadImage(dataUrl);
@@ -285,10 +275,10 @@ gotoapp();
       // 调整尺寸并转换为 PNG
       updateStatus(`正在调整尺寸为 ${targetWidth}x${targetHeight}...`, 'statusText');
       const processedDataUrl = await resizeImageToPNG(img, targetWidth, targetHeight);
-      
+
       // 提取 Base64 数据
       const base64Data = processedDataUrl.split(',')[1];
-      
+
       // 计算处理后的大小
       const processedSize = Math.ceil(base64Data.length * 0.75);
       sandbox.log(`处理后图片大小: ${formatFileSize(processedSize)}`);
@@ -344,7 +334,7 @@ gotoapp();
     } catch (error) {
       updateStatus(`错误: ${error.message}`, 'statusText');
       sandbox.log(`处理/传输错误: ${error.message}`);
-      
+
       // 发送错误消息
       sendError(device.addr, 'TRANSFER_ERROR', error.message);
     } finally {
@@ -356,7 +346,7 @@ gotoapp();
   async function sendImageChunks(deviceAddr) {
     const base64Data = currentFileData.base64;
     const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE);
-    
+
     sandbox.log(`总分片数: ${totalChunks}`);
     sandbox.log(`图片大小: ${base64Data.length} bytes`);
 
